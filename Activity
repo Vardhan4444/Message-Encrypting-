@@ -1,0 +1,30 @@
+class UsersActivity : AppCompatActivity() {
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_users)
+val user = intent.getStringExtra(EXTRA_USER)!!
+val authToken = intent.getStringExtra(EXTRA_AUTH_TOKEN)!!
+val virgilToken = intent.getStringExtra(EXTRA_VIRGIL_TOKEN)!!
+val list: ListView = findViewById<View>(R.id.listview) as ListView
+val adapter = ArrayAdapter(
+this,
+android.R.layout.simple_list_item_1,
+mutableListOf<String>()
+)
+list.adapter = adapter
+list.onItemClickListener = AdapterView.OnItemClickListener { parent,
+view, position, id ->
+val otherUser = adapter.getItem(position).toString()
+val intent = ChannelActivity.newIntent(this, user, otherUser,
+virgilToken)
+startActivity(intent)
+}
+doAsync {
+val users = getUsers(authToken).filterNot { it == user }
+uiThread { adapter.addAll(users) }
+}
+}
+// ...
+}
+
+
